@@ -14,7 +14,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     // Obtener el tamaño de la pantalla del dispositivo
-    final Size size = MediaQuery.of(context).size;
+    final Size tamano = MediaQuery.of(context).size;
     return Scaffold(
       // Evita nudge o cámaras frontales para móviles
       body: SafeArea(
@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             children: [
               SizedBox(
-                width: size.width,
+                width: tamano.width,
                 height: 200,
                 child: RiveAnimation.asset(
                   "assets/animated_login_character.riv",
@@ -61,8 +61,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     icon: Icon(
                       _isPassword
                           ? Icons
-                                .visibility // Ojo cerrado
-                          : Icons.visibility_off, // Ojo abierto
+                                .visibility_off // Ojo cerrado
+                          : Icons.visibility, // Ojo abierto
                     ),
                     onPressed: () {
                       setState(() {
