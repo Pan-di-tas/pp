@@ -9,21 +9,24 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _isPasswordVisible = false;
-
-  // Controlador de Rive
+  bool obscured = true;
+  //cerebro de las animaciones (state machine)
   StateMachineController? controller;
+  //SMI: State Machine Input
   SMIBool? isChecking;
   SMIBool? isHandsUp;
-  SMITrigger? trigSuccess; // deben ser SMITrigger
+  SMITrigger? trigSuccess;
   SMITrigger? trigFail;
 
   @override
   Widget build(BuildContext context) {
+    //para obtener/consultar el tamaño de la pantalla
     final Size tamano = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
+        //margen interior
         child: Padding(
+          //
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
@@ -31,44 +34,40 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: tamano.width,
                 height: 200,
                 child: RiveAnimation.asset(
-                  "assets/animated_login_character.riv",
-                  stateMachines: const ["Login Machine"],
+                  'assets/animated_login_character.riv', // <-- corregido
+                  stateMachines: ["Login Machine"],
+                  //al iniciarse
                   onInit: (artboard) {
                     controller = StateMachineController.fromArtboard(
                       artboard,
                       "Login Machine",
                     );
+                    //verificar que inicio bien
                     if (controller == null) return;
                     artboard.addController(controller!);
-
-                    // Buscar los inputs
-                    isChecking =
-                        controller!.findInput<bool>("isChecking") as SMIBool?;
-                    isHandsUp =
-                        controller!.findInput<bool>("isHandsUp") as SMIBool?;
-                    trigSuccess =
-                        controller!.findInput<bool>("trigSuccess")
-                            as SMITrigger?;
-                    trigFail =
-                        controller!.findInput<bool>("trigFail") as SMITrigger?;
+                    isChecking = controller!.findSMI("isChecking");
+                    isHandsUp = controller!.findSMI("isHandsUp");
+                    trigSuccess = controller!.findSMI("trigSuccess");
+                    trigFail = controller!.findSMI("trigFail");
                   },
                 ),
               ),
               const SizedBox(height: 10),
+              //campo de texto de Email
               TextField(
                 onChanged: (value) {
-                  // Baja las manos si escribe en email
                   if (isHandsUp != null) {
-                    isHandsUp!.value = false;
+                    //no tapar los ojos
+                    isHandsUp!.change(false);
                   }
-                  // Activa modo chismoso
-                  if (isChecking != null) {
-                    isChecking!.value = true;
-                  }
+                  if (isChecking == null) return;
+                  //activa el modo chismoso
+                  isChecking!.change(true);
                 },
+                //para que aparezca @ en móviles
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  hintText: "Email",
+                  labelText: "E-Mail",
                   prefixIcon: const Icon(Icons.mail),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -78,46 +77,45 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 10),
               TextField(
                 onChanged: (value) {
-                  // Apaga modo chismoso
-                  if (isChecking != null) {
-                    isChecking!.value = false;
-                  }
-                  // Levanta las manos si escribe en password
                   if (isHandsUp != null) {
-                    isHandsUp!.value = true;
+                    //no tapar los ojos
+                    isHandsUp!.change(true);
                   }
+                  if (isChecking == null) return;
+                  //activa el modo chismoso
+                  isChecking!.change(false);
                 },
-                obscureText: !_isPasswordVisible,
+                //para que aparezca password en móviles
+                obscureText: obscured,
                 decoration: InputDecoration(
-                  hintText: "Password",
+                  labelText: "Password",
                   prefixIcon: const Icon(Icons.lock),
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        obscured = !obscured;
+                      });
+                    },
+                    icon: Icon(
+                      obscured ? Icons.visibility : Icons.visibility_off,
+                    ),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _isPasswordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _isPasswordVisible = !_isPasswordVisible;
-                      });
-                    },
-                  ),
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               SizedBox(
                 width: tamano.width,
                 child: const Text(
-                  "¿Olvidaste tu contraseña?",
+                  "Forgot password",
                   textAlign: TextAlign.right,
                   style: TextStyle(decoration: TextDecoration.underline),
                 ),
               ),
-              const SizedBox(height: 10),
+              //boton de login
+              SizedBox(height: 10),
               MaterialButton(
                 minWidth: tamano.width,
                 height: 50,
@@ -126,27 +124,25 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 onPressed: () {
-                  // Aquí podrías validar datos y disparar triggers
-                  bool loginOk = true; // ejemplo
-                  if (loginOk) {
-                    trigSuccess?.fire();
-                  } else {
-                    trigFail?.fire();
-                  }
+                  //TO DO: validar campos
                 },
-                child: const Text(
-                  "Login",
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
+                child: Text("Login", style: TextStyle(color: Colors.white)),
               ),
               const SizedBox(height: 10),
               SizedBox(
                 width: tamano.width,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don’t have an account?"),
-                    TextButton(onPressed: () {}, child: const Text("Register")),
+                    const Text(
+                      "Register",
+                      style: TextStyle(
+                        color: Colors.black,
+                        //en negritas
+                        fontWeight: FontWeight.bold,
+                        //subrayado
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
                   ],
                 ),
               ),
