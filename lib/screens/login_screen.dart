@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; //Material para android, Cupertino para iOS
 import 'package:rive/rive.dart';
 
 class LoginScreen extends StatefulWidget {
