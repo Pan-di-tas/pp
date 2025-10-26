@@ -100,6 +100,7 @@ bool isValidPassword(String pass) {
 ## 🎥 Demo
 
 Here’s how it looks in action! 👇
+![Rive Login Demo](assets/Demo.gif)
 
 ---
 
