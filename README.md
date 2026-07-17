@@ -104,13 +104,6 @@ Here’s how it looks in action! 👇
 
 ---
 
-## 📚 Subject Information
-
-Subject: Graficación\
-Teacher: Rodrigo Fidel Gaxiola Sosa
-
----
-
 ## 🖋️ Credits
 
 🎨 Animation by: Rive Community / Original Creator’s Link
